@@ -1,0 +1,59 @@
+---
+title: "MRLM COVID"
+author: "Equipo X"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+header-includes: 
+  - \usepackage{fancyhdr}
+output:
+   pdf_document:
+    toc: True
+    highlight: 'kate'
+    number_sections: TRUE
+editor_options: 
+mainfont: Bookman Old Style
+---
+\thispagestyle{empty}
+\pagebreak
+\newpage
+\pagenumbering{arabic} 
+\fancyhead[L]{\thepage}
+\fancyfoot[C]{Equipo X}
+\pagestyle{fancy}
+\addtolength{\headheight}{1.0cm}
+\pagestyle{fancyplain}
+\rhead{\includegraphics[height=1cm]{`r here::here('ITAM.png')`}}
+
+
+
+```{r setup, include=FALSE}
+
+#Descargar el packete here en caso de que el archivo no knitee
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.align = 'center')
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(verbose = FALSE)
+knitr::opts_chunk$set(fig.width=12, fig.height=8) 
+options(tinytex.verbose = TRUE)
+
+library(tidyverse)
+library(MASS)
+library(GGally)
+library(fBasics)
+library(knitr)
+library(broom)
+library(caTools)
+library(car)
+
+
+rm(list=ls())
+
+set.seed(3234)
+
+raw_df <- read.csv("owid-covid-data.csv")
+
+
+```
+
+
