@@ -27,7 +27,7 @@ mainfont: Bookman Old Style
 
 ```{r setup, include=FALSE}
 
-#Descargar el packete here en caso de que el archivo no knitee
+#Descargar el paquete "here" en caso de que el archivo no knitee
 
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(fig.align = 'center')
@@ -51,9 +51,87 @@ rm(list=ls())
 
 set.seed(3234)
 
-raw_df <- read.csv("owid-covid-data.csv")
+raw_df <- read_csv("owid-covid-data.csv")
 
 
 ```
 
+
+# Introducción
+
+## Problema de interés: Análisis del precio de los vehículos
+
+### Breve explicación de la base de datos
+
+\pagebreak
+\newpage
+
+# Marco teórico 
+
+## Conceptos básicos
+
+## Supuestos del modelo 
+
+## Método de selección de variables y limitaciones del modelo
+
+\pagebreak
+\newpage
+
+# Análisis exploratorio de datos
+
+## Análisis de la base de datos
+
+
+Aquí va filtros aplicados, estadígrafos, gráficas, limpieza y selección de variable depen-
+diente con justificación
+
+## Selección de la variable explicativa 
+
+\pagebreak
+\newpage
+
+# Modelo de regresión lineal múltiple 
+
+## Justificación de la selección del MRLM
+
+## Limitantes del modelo 
+
+\pagebreak
+\newpage
+
+## Análisis y significancia de los coeficientes 
+
+## R^2 y R^2 Ajustada (Bondad de ajuste)
+
+\pagebreak
+\newpage
+
+## Supuestos y validación del modelo 
+
+### Análisis de residuales
+
+#### Comprobación de la linealidad de la Fn de regresión
+
+#### Heterocedasticidad 
+
+#### Independencia en los errores 
+
+#### Presencia de errores atípicos 
+
+#### Verificación de la normalidad en los errores 
+
+# Predicciones
+
+# Conclusiones
+
+## Porqué es útil el modelo
+
+## Cómo mejorar el modelo 
+
+\pagebreak
+\newpage
+
+# Bibliografía
+
+Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani, Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020) - "Coronavirus Pandemic (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
 
