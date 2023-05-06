@@ -59,9 +59,11 @@ raw_df <- read_csv("owid-covid-data.csv")
 
 # Introducción
 
-## Problema de interés: Análisis del precio de los vehículos
+## Problema de interés: Análisis 
 
 ### Breve explicación de la base de datos
+
+Al momento de seleccionar variables eliminamos variables que explicaban lo mismo pero tenían algún tipo de transformación lineal. Un ejemplo de estas son total_cases y total_cases_per_million. 
 
 \pagebreak
 \newpage
@@ -119,6 +121,9 @@ diente con justificación
 #### Presencia de errores atípicos 
 
 #### Verificación de la normalidad en los errores 
+
+\pagebreak
+\newpage
 
 # Predicciones
 
