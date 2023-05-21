@@ -46,35 +46,82 @@ library(broom)
 library(caTools)
 library(car)
 
-
-rm(list=ls())
-
 set.seed(3234)
-
-raw_df <- read_csv("owid-covid-data.csv")
-
 
 ```
 
 
 # Introducción
 
-## Problema de interés: Análisis 
+## Problema de interés: Análisis de new_deaths_smoothed_per_million con un MRLM en Bélgica, Suecia, Grecia y Portugal.
+
+Queremos analizar el efecto que tuvieron las variables elegidas con respecto las muertes del COVID, y elegimos 4 países de Europa para ello. 
+
+Los países fueron seleccionados por dos criterios:
+- Su GDP per capita, dos países con PIB de 20,000 USD, Grecia y Portugal y dos países arriba de 50,000, Bélgica y Suiza
+- Los cuatro países tienen la misma cantidad de población, entre 10 millones y 12 millones.
+
 
 ### Breve explicación de la base de datos
 
-Al momento de seleccionar variables eliminamos variables que explicaban lo mismo pero tenían algún tipo de transformación lineal. Un ejemplo de estas son total_cases y total_cases_per_million. 
+
+**Glosario de Y y los regresores que utilizamos.**
+
+La información está tomando en cuenta los 7 días de la semana.
+
+**Smoothed_data:** Los datos que estan "smoothed" significa que las cuentas incluyen los datos reportadas pero también se agregan los probables, estamos utilizando estas variables porque nuestro análisis incluye dos países con información reservada, Grecia y Portugal.
+
+Y nuestra variable a analizar - new_deaths_smoothed_per_million: Son las nuevas muertes atribuidas al COVID-19. Por millón de personas
+
+Location: Es la ubicación geografica 
+
+Date: Del 2020-02-01 al 2023-02-24
+
+new_cases_smoothed_per_million: Nuevos casos confirmados de COVID-19 por millón de personas.
+
+reproduction_rate: Estimación a tiempo real de la reproducción efectiva del COVID
+
+icu_patients_per_million: Numero de pacientes con COVID que están en cuidados intensivos, por millón de personas 
+
+hosp_patients_per_million: Numero de pacientes con COVID en hospitales, por millón de personas.
+
+new_tests_smoothed_per_thousand: Son nuevos exámenes de COVID, por miles.
+
+positive_rate: Son exámenes que salen positivos de COVID
+
+tests_per_case: Pruebas realizadas de COVID
+
+people_vaccinated_per_hundred: Son el total de personas con al menos una vacuna, por 100
+
+stringency_index: Son las reacciones políticas basadas en 9 indicadores. en un valor del 0 al 100, 100 siendo el más estricto. Ejemplo de ello sería cerrar escuelas.
+
+excess_mortality_cumulative_per_million: Es la diferencia entre las personas que se reportan como muertas y las proyectadas.
+
 
 \pagebreak
 \newpage
 
 # Marco teórico 
 
+
 ## Conceptos básicos
 
 ## Supuestos del modelo 
 
-## Método de selección de variables y limitaciones del modelo
+## Método de selección de variables 
+
+Al momento de seleccionar variables eliminamos variables que explicaban lo mismo pero tenían algún tipo de transformación lineal. Un ejemplo de estas son total_cases y total_cases_per_million, ya que estamos explicando una variable que ya tiene una transformación en per_million nos vamos a quedar con todos los regresores que están en per_million.
+
+Con las variables que quedaron de esa selección, utilizamos el método "Backward" de selección de variables, el cual utiliza todas las variables y va eliminadolas dependiendo de su p-value, le indicamos a la función a que eliminara las variables que tuvieran un p-value mayor a .05.
+
+Ya por último, con la selección restante, utilizamos el Variance Inflation Factor (VIF), su expresión matemática es (1/(1-Ri^2)), el cual nos ayuda a cuantificar la intensidad que hay de multicolinealidad entre los regresores. Aceptamos Variables con VIF menores de 10 en el modelo.
+
+## Limitaciones del modelo
+
+Una gran limitación con la que nos encontramos en el MRLM es que aun cuando los datos no se distribuyen normal, asumimos una distribución normal para hacer inferencia. El MRLM es robusto para variables que no se distribuyen normal, no obstante, eso nunca va a ser un modelo exacto apegado a la realidad
+
+El MRLM también asume que hay una linealidad entre la variable dependiente y la independiente, pero cuando hay datos que no son lineales entre sí o que tienen relaciones complejas, el MRLM no logra predecir el comportamiento de las variables de forma acertada.
+
 
 \pagebreak
 \newpage
@@ -83,11 +130,17 @@ Al momento de seleccionar variables eliminamos variables que explicaban lo mismo
 
 ## Análisis de la base de datos
 
+De la librería de tidyr, utilizamos la función filter, para filtrar la base de datos por los 4 países seleccionados
 
-Aquí va filtros aplicados, estadígrafos, gráficas, limpieza y selección de variable depen-
-diente con justificación
+Utilizamos de la librería dplyr la función de select, para eliminar las variables que la selección backward nos quitó, ya que de esa forma las eliminabamos de la base a modelar.
+
+Los NA, los hicimos 0 ya que en todos los casos si hace sentido que NA sea = a 0 ya que no hay datos negativos.
+
+Seleccionamos new_deaths_smoothed_per_million ya que es una variable que nos explica cuantas personas fueron muriendo debido al COVID y que tanto funcionaron las medidas de restricción, hospitalarias y las vacunaciones para que ese numero diminuyera.
 
 ## Selección de la variable explicativa 
+
+Fuimos seleccionando los regresores por varios métodos, explicados en el punto 2.3, pero igual hacemos énfasis en las admisiones hospitalarias y las restricciones por país.
 
 \pagebreak
 \newpage
@@ -96,25 +149,86 @@ diente con justificación
 
 ## Justificación de la selección del MRLM
 
-## Limitantes del modelo 
 
 \pagebreak
 \newpage
 
 ## Análisis y significancia de los coeficientes 
 
+```{r Significancia, comment = ""}
+
+source("MRLM_COVID.R")
+
+Anova(backward_model)
+
+
+```
+Se puede observar en la tabla ANOVA, que todos los coeficientes seleccionados son significativos, esto es debido a que el p-value es menor a 0.05.
+
 ## R^2 y R^2 Ajustada (Bondad de ajuste)
+
+
+```{r R^2, comment ="La R^2 es"}
+
+source("MRLM_COVID.R")
+
+suma_m <- summary(backward_model)
+suma_m$r.squared
+
+```
+
+```{r, R^2_ADJ, comment ="La R^2 ajustada es"}
+
+source("MRLM_COVID.R")
+
+suma_m <- summary(backward_model)
+suma_m$adj.r.squared
+
+```
+
+
 
 \pagebreak
 \newpage
 
 ## Supuestos y validación del modelo 
 
+
 ### Análisis de residuales
 
 #### Comprobación de la linealidad de la Fn de regresión
 
+Eso lo comprobamos con las R^2 ya que sabemos que matemáticamente es SSE/SST y es el porcentaje de variabilidad que es explicada por el modelo.
+
+
+
+```{r, R^2_ADJ_Supuestos, comment = "Una R^2 ajustada de"}
+
+source("MRLM_COVID.R")
+
+suma_m <- summary(backward_model)
+suma_m$adj.r.squared
+
+```
+
+nos dice que hay una bondad de ajuste del 70% de nuestro modelo con Y
+
 #### Heterocedasticidad 
+
+Comprobamos heterocedisticidad (la varianza de los errores es constante), lo comprobamos con un gráfico comparando los residuales con las Y observadas (ŷ), para esto tenemos que hacer un DF con ambos vectores obtenidos de nuestro modelo
+
+
+```{r, heter, comment = ""}
+
+source("MRLM_COVID.R")
+
+grafico_heter
+
+```
+
+Debido a que hay un pseudo patrón y se puede llegar a observar una linea recta, vamos a comprobar si hay o no heterocedasticidad con la prueba de Breusch-Pagan
+
+
 
 #### Independencia en los errores 
 

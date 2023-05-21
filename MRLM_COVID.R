@@ -39,7 +39,9 @@ filtered_df <- df_by_countries %>%
                 -new_vaccinations, -total_vaccinations, -people_fully_vaccinated, -total_boosters, -new_vaccinations_smoothed,
                 -new_people_vaccinated_smoothed, -people_vaccinated, -excess_mortality_cumulative_absolute, -excess_mortality,
                 -total_vaccinations_per_hundred, -people_fully_vaccinated_per_hundred,  -total_cases_per_million, -excess_mortality_cumulative,
-                -total_boosters_per_hundred)
+                -total_boosters_per_hundred, -weekly_icu_admissions_per_million, -weekly_hosp_admissions_per_million,
+                -total_deaths_per_million, -weekly_icu_admissions, -total_tests_per_thousand, -new_vaccinations_smoothed_per_million, -date,
+                -excess_mortality_cumulative_per_million, -new_people_vaccinated_smoothed_per_hundred)
 
 # Dividimos 70 - 30 nuestra base para hacer el análisis 
 
@@ -63,7 +65,7 @@ summary(backward_model)
 
 vif(backward_model)
 
-# Ya tenemos todas las variables con un VIF menor a 10 y tofas con un nivel de significancia menor a 0.05, excepto por la división de las 
+# Ya tenemos todas las variables con un VIF menor a 10 y todas con un nivel de significancia menor a 0.05, excepto por la división de las 
 # variables de character, ya que se dejan en el modelo por una que sí sea significativa 
 
 # Análisis de residuales ####
@@ -91,6 +93,10 @@ grafico_heter <- prueba_heter %>%
 
 plotly::ggplotly(grafico_heter)
 
+# por el medio patrón que se encuentra, utilizamos el método de Breusch-Pagan
+
+bptest(backward_model, studentize = TRUE)
+
 # 3.3 Independencia en los errores ####
 
 # Al ser una serie de tiempo, sí hay que buscar la independencia de los errores 
@@ -117,14 +123,13 @@ sqrt_mse <- sqrt(anova[6,3])
 # Esas variables las metemos en un DF 
 
 df_ea_back_model <- as.data.frame(cbind(train.base$new_cases_smoothed_per_million, train.base$reproduction_rate, train.base$icu_patients_per_million,
-                                        train.base$hosp_patients_per_million, train.base$weekly_icu_admissions_per_million, 
-                                        train.base$weekly_hosp_admissions_per_million, train.base$new_tests_smoothed_per_thousand, 
-                                        train.base$tests_per_case, train.base$people_vaccinated_per_hundred, 
-                                        train.base$new_vaccinations_smoothed_per_million, train.base$new_people_vaccinated_smoothed_per_hundred,
+                                        train.base$hosp_patients_per_million, train.base$new_tests_smoothed_per_thousand,
+                                        train.base$positive_rate, train.base$tests_per_case, train.base$people_vaccinated_per_hundred, 
+                                        train.base$new_people_vaccinated_smoothed_per_hundred,
                                         train.base$stringency_index, train.base$excess_mortality_cumulative_per_million, 
                                         backward_model$residuals/sqrt_mse))
 
-colnames(df_ea_back_model) <- c("X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10","X11", "X12", "X13", "Errores")
+colnames(df_ea_back_model) <- c("X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10","X11", "Errores")
 
 grafico_ea <- df_ea_back_model %>% 
   ggplot() + 
@@ -134,21 +139,18 @@ grafico_ea <- df_ea_back_model %>%
   geom_point(aes(x = X2, y = Errores, color = "reproduction_rate")) +
   geom_point(aes(x = X3, y = Errores, color = "icu_patients_per_million")) +
   geom_point(aes(x = X4, y = Errores, color = "hosp_patients_per_million")) +
-  geom_point(aes(x = X5, y = Errores, color = "weekly_icu_admissions_per_million")) + 
-  geom_point(aes(x = X6, y = Errores, color = "weekly_hosp_admissions_per_million")) + 
-  geom_point(aes(x = X7, y = Errores, color = "new_tests_smoothed_per_thousand")) +
-  geom_point(aes(x = X8, y = Errores, color = "tests_per_case")) +
-  geom_point(aes(x = X9, y = Errores, color = "people_vaccinated_per_hundred")) +
-  geom_point(aes(x = X10, y = Errores, color = "new_vaccinations_smoothed_per_million")) + 
-  geom_point(aes(x = X11, y = Errores, color = "new_people_vaccinated_smoothed_per_hundred")) + 
-  geom_point(aes(x = X12, y = Errores, color = "stringency_index")) +
-  geom_point(aes(x = X13, y = Errores, color = "excess_mortality_cumulative_per_million")) +
+  geom_point(aes(x = X5, y = Errores, color = "new_tests_smoothed_per_thousand")) +
+  geom_point(aes(x = X6, y = Errores, color = "positive_rate")) +
+  geom_point(aes(x = X7, y = Errores, color = "tests_per_case")) +
+  geom_point(aes(x = X8, y = Errores, color = "people_vaccinated_per_hundred")) + 
+  geom_point(aes(x = X9, y = Errores, color = "new_people_vaccinated_smoothed_per_hundred")) +
+  geom_point(aes(x = X10, y = Errores, color = "stringency_index")) +
+  geom_point(aes(x = X11, y = Errores, color = "excess_mortality_cumulative_per_million")) +
   ggtitle("X vs ui / raiz(mse)") +
   ylab("ui / raiz(mse)") +
   labs(title = "Datos atípicos") + 
   scale_color_manual(values = c("new_cases_smoothed_per_million" = "blue", "reproduction_rate" = "green", "icu_patients_per_million" = "black", 
-                                "hosp_patients_per_million" = "red", "weekly_icu_admissions_per_million" = "purple",
-                                "weekly_hosp_admissions_per_million" = "pink", "new_tests_smoothed_per_thousand" = "brown", "tests_per_case" = "yellow", 
+                                "hosp_patients_per_million" = "red", "new_tests_smoothed_per_thousand" = "brown", "tests_per_case" = "yellow", 
                                 "people_vaccinated_per_hundred" = "gray", "new_vaccinations_smoothed_per_million" = "orange", 
                                 "new_people_vaccinated_smoothed_per_hundred" = "gold",
                                 "stringency_index" = "lightblue", "excess_mortality_cumulative_per_million" = "lightgreen")) +
@@ -182,7 +184,19 @@ ui_back %>%
 # no obstante, ya que el modelo de regresión lineal simple ajustado es robusto ante el supuesto de normalidad
 # podemos continuar usando estas variable
 
+# 4. Intervalos de Confianza ( E[Y/X´s] ) y de predicción (Ys) ####
 
+# Intervalo de confianza 
+
+confianza <- as.data.frame(predict.lm(backward_model, train.base, interval = "confidence", level = .95))
+
+colnames(confianza) <- c("Y_Estimada", "lwr", "upr")
+
+# Intervalo de Predicción
+
+prediccion <- as.data.frame(predict.lm(backward_model, train.base, interval = "prediction", level = .95))
+
+colnames(prediccion) <- c("Y_Observada_predecida", "lwr_pred", "upr_pred")
 
 
 
