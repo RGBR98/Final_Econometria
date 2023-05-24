@@ -386,7 +386,7 @@ p <- ggplot(val_lm_df, aes(date, new_deaths)) +
 
 #
 
-grafico_pred <- p +
+grafico_pred <- ggplot(val_lm_df, aes(x = date)) + 
   stat_smooth(aes(y = lwr1), color = "red", linetype = "dashed", se = FALSE) +
   stat_smooth(aes(y = upr1), color = "red", linetype = "dashed", se = FALSE) +
   stat_smooth(aes(y = pred), color = "blue", se = FALSE) +
@@ -397,5 +397,4 @@ grafico_pred <- p +
   theme(plot.title = element_text(hjust = 0.5))
 
 plotly::ggplotly(grafico_pred)
-
 

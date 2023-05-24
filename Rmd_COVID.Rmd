@@ -1,6 +1,6 @@
 ---
 title: "MRLM COVID"
-author: "Equipo X"
+author: "Equipo R.E.J.O"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 header-includes: 
   - \usepackage{fancyhdr}
@@ -17,7 +17,7 @@ mainfont: Bookman Old Style
 \newpage
 \pagenumbering{arabic} 
 \fancyhead[L]{\thepage}
-\fancyfoot[C]{Equipo X}
+\fancyfoot[C]{Equipo R.E.J.O}
 \pagestyle{fancy}
 \addtolength{\headheight}{1.0cm}
 \pagestyle{fancyplain}
@@ -47,18 +47,14 @@ library(caTools)
 library(car)
 library(zoo)
 
-<<<<<<< Updated upstream
+
 
 rm(list=ls())
 
-set.seed(3234)
-=======
+
 set.seed(323)
 
 source("MRLM_EUA.R")
->>>>>>> Stashed changes
-
-raw_df <- read_csv("owid-covid-data.csv")
 
 
 ```
@@ -66,16 +62,16 @@ raw_df <- read_csv("owid-covid-data.csv")
 
 # Introducción
 
-<<<<<<< Updated upstream
-## Problema de interés: Análisis 
+En marzo de 2020 la Organización Mundial de la Salud (OMS) elevó la crisis de salud pública ocasionada por el virus del COVID-19 al grado de pandemia, tan solo cuatro meses después de que el virus fuera identificado en la ciudad de Wuhan, China. Para ese momento había 118 mil casos confirmados en 114 países, y 4291 personas habían perdido la vida. El anuncio incitó a los países de alrededor del mundo a que instauraran mediadas para mitigar el contagio y tratar a los enfermos. Algunos países, como Estados Unidos, habían movilizado sus sistemas de respuesta desde enero, no obstante, la pandemia tuvo efectos devastadores.
 
-### Breve explicación de la base de datos
+El Centro para el Control y la Prevención de Enfermedades (CDC por sus siglas en ingles), activó un plan de respuesta desde enero de 2020, priorizando la distribución de información y controles aeroportuarios. En los meses subsecuentes, adoptarían el uso general de pruebas, el aislamiento selectivo y el uso de mascarillas para evitar la propagación del contagio. No obstante, a pesar de las medidas insaturadas, no sería hasta agosto del siguiente año que la pandemia tocaría un punto de quiebre. El 14 de diciembre del 2020, la Administración de Alimentos y Medicamentos de los Estados Unidos (FDA por sus siglas en inglés) aprobaría la vacuna Pfizer-BioNTech para su uso en personas mayores de 18 años. Esta sería la primera vacuna contra el COVID-19 aprobada y representaría un avance fundamental en la estrategia de mitigación del patógeno.  
 
-Al momento de seleccionar variables eliminamos variables que explicaban lo mismo pero tenían algún tipo de transformación lineal. Un ejemplo de estas son total_cases y total_cases_per_million. 
-=======
-## Problema de interés: Análisis de new_deaths con un MRLM en EUA tomando como base de entrenamiento desde el momento en el que salió la vacuna hasta el final de la ola 3, para poder predecir la ola 4 con el modelo
+Al 9 de septiembre de 2021, se han administrado 377,6 millones de dosis de vacunas. En general, aproximadamente el 62.7% de la población total de Estados Unidos, han recibido al menos una dosis de la vacuna, mientras que el 53.4% han sido completamente vacunados. Se espera inoculación de la población cambiará el comportamiento de los fallecimientos en los próximos meses. Ahora, al tratarse de una enfermedad estacionaria, los tomadores de decisiones en el sector salud deben hacer uso de la información recabada para anticiparse a las necesidades de los pacientes en temporada de COVID-19. Para ello, nuestra investigación propone aplicar un modelo de regresión lineal múltiple para evaluar la vacunación como un factor de predicción de las olas subsecuentes de COVID-19. Esto permitirá a los hospitales y demás servicios de salud programar costos asociadas a pruebas, tratamientos y medicamentos relacionados al patógeno SARS-Cov-2. 
 
-Queremos analizar el efecto que tuvieron las variables elegidas con respecto las muertes del COVID y con esos regresores poder analizar las siguientes olas del covid.
+
+## Problema de interés
+
+Aplicación de un modelo de regresión lineal múltiple para evaluar la vacunación como un factor de predicción de una cuarta ola de muertes por COVID-19 en EUA, incluyendo la estimación a tiempo real de la reproducción efectiva del COVID y el porcentaje de pruebas COVID positivas que hay en la población.
 
 
 ### Breve explicación de la base de datos
@@ -83,22 +79,20 @@ Queremos analizar el efecto que tuvieron las variables elegidas con respecto las
 
 **Glosario de Y y los regresores que utilizamos.**
 
-La información está tomando en cuenta los 7 días de la semana.
-
-
 **Nuestra variable a analizar [Y] - new_deaths:** Son las nuevas muertes atribuidas al COVID-19. 
 
 **Location:** Es la ubicación geografica, nos ayudó a filtrar nuestra base de datos sólo a USA
 
 **Date:** Desde la primer vacunación recibida en EUA al final de la 4ta ola 
 
-**reproduction_rate:** Estimación a tiempo real de la reproducción efectiva del COVID
+**Reproduction_rate:** Estimación a tiempo real de la reproducción efectiva del COVID
 
-**positive_rate:** El porcentaje de pruebas COVID positivas que hay 
+**Positive_rate:** El porcentaje de pruebas COVID positivas que hay 
 
-**new_vaccinations:** Nuevas vacunas administradas de COVID 19
+**New_vaccinations:** Nuevas vacunas administradas de COVID 19
 
->>>>>>> Stashed changes
+**Nota:** La información está tomando en cuenta los 7 días de la semana.
+
 
 \pagebreak
 \newpage
@@ -107,31 +101,33 @@ La información está tomando en cuenta los 7 días de la semana.
 
 ## Conceptos básicos
 
-El MRLM es una técnica para modelar la relación lineal entre 3 o más variables. De manera general, el MRLM se define en la siguiente ecuación: y=BO + B1X1 + B2X2 + . . . + BnXn + U Donde y es la variable dependiente y las Xi son las variables independientes, mientras que la variable u, denominada como la perturbación estocástica, son variables aleatorias no observables que representa a todos los factores distintos de x que afectan a y. 
+El MRLM es una técnica para modelar la relación lineal entre 2 o más variables. De manera general, el MRLM se define en la siguiente ecuación: Y = BO + B1X1 + B2X2 + . . . + BnXn + U 
 
-En tanto BO, representa el coeficiente del intercepto y las B1 en adelante representan los coeficientes de cada pendiente. Los coeficientes de las pendientes son el interés principal del análisis econométrico, pues mide el efecto de las variables independientes sobre la variable dependiente mantenido todos los demás factores constantes.
+Donde Y es la variable dependiente y las Xi son las variables independientes, mientras que la variable u, denominada como la perturbación estocástica, son variables aleatorias no observables que representa a todos los factores distintos de X que afectan a Y. 
+
+En tanto BO, representa el coeficiente del intercepto y las B1 en adelante representan los coeficientes de cada pendiente. Los coeficientes de las pendientes son el interés principal del análisis econométrico, pues mide el efecto de las variables independientes sobre la variable dependiente manteniendo todos los demás factores constantes.
 
 
 ## Supuestos del modelo 
 
-<<<<<<< Updated upstream
-## Método de selección de variables y limitaciones del modelo
-=======
-Hay algunos requisitos o supuestos que se deben cumplir para que el modelo sea válido y confiable. Estos son los cuatro supuestos principales:
+Hay algunos requisitos o supuestos que se deben cumplir para que el modelo sea válido y confiable. Estos son los cinco supuestos principales:
 
-Independencia: los residuos (las diferencias entre los valores observados y los estimados por el modelo) deben ser independientes entre sí. Esto significa que no hay una relación o patrón entre los errores del modelo. Una forma de asegurar la independencia es seleccionar los datos de forma aleatoria y no sesgada.
-Homocedasticidad: los residuos deben tener una varianza constante. Esto significa que la variabilidad de los errores del modelo no depende del valor de las variables independientes.
+Independencia de los residuales: los residuos (las diferencias entre los valores observados y los estimados por el modelo) deben ser independientes entre sí. Esto significa que no hay una relación o patrón entre los errores del modelo. Una forma de asegurar la independencia es seleccionar los datos de forma aleatoria y no sesgada. no obstante esto se puede arreglar aplicandole un Lag a la variable Y.
 
-No multicolinealidad: las variables independientes no deben estar relacionadas entre sí o, al menos, su relación debe ser muy débil. Esto significa que no hay redundancia o duplicidad en la información que aportan las variables independientes al modelo.
+Homocedasticidad: los residuos deben tener una varianza constante. Esto significa que la variabilidad de los errores del modelo no depende del valor de las variables independientes. var(ui) = var
+
+No multicolinealidad: las variables independientes no deben estar relacionadas entre sí o, al menos, su relación debe ser muy débil. Esto significa que no hay redundancia o duplicidad en la información que aportan las variables independientes al modelo. Se puede comprobar que no hay con el Varianze Inflation Coefficient (VIF)
 
 Normalidad: los residuos deben seguir una distribución normal, es decir, una distribución simétrica y acampanada alrededor del cero. Esto significa que los errores del modelo son aleatorios y no tienen tendencia o sesgo. Una forma de comprobar la normalidad es mediante un gráfico de probabilidad normal o una prueba estadística.
+
+Valores atípicos: No deben existir datos atípicos ya que eso tiende a sesgar la regresión lineal. Cuando existe una serie de tiempo, como es el caso, se debe aplicar un Cap y un floor para que los datos no se pasen de esos datos.
 
 
 ## Método de selección de variables 
 
-Al momento de seleccionar variables eliminamos variables que explicaban lo mismo pero tenían algún tipo de transformación lineal. Un ejemplo de estas son new_vaccinations y new_vaccinations_per_million.
+Al momento de seleccionar variables, eliminamos variables que explicaban lo mismo pero tenían algún tipo de transformación lineal. Un ejemplo de estas son new_vaccinations y new_vaccinations_per_million.
 
-Eliminamos variables que eran constantes y variables que fueran de character.
+Eliminamos variables que eran constantes y variables que fueran de character, fuera de location ya que la usamos para filtra nuestra base de datos.
 
 Checamos de las variables restantes con gráficos de ggpairs, y vimos las relaciones que tenía new_deaths con las variables restantes, dejando en nuestro modelo las variables que tuvieran una relación lineal respecto a nuestra Y
 
@@ -139,9 +135,8 @@ Al meter las variables elegidas al modelo, vimos que quedaban algunas que tenía
 
 Ya por último, con la selección restante, utilizamos el Variance Inflation Factor (VIF), su expresión matemática es (1/(1-Ri^2)), el cual nos ayuda a cuantificar la intensidad que hay de multicolinealidad entre los regresores. Aceptamos Variables con VIF menores de 10 en el modelo.
 
-## Limitaciones del modelo
 
-Una gran limitación con la que nos encontramos en el MRLM es que aun cuando los datos no se distribuyen normal, asumimos una distribución normal para hacer inferencia. El MRLM es robusto para variables que no se distribuyen normal, no obstante, eso nunca va a ser un modelo exacto apegado a la realidad
+## Limitaciones del modelo
 
 Usar un modelo de regresión lineal múltiple como modelo de predicción tiene algunas limitaciones que debemos tener en cuenta. Estas son algunas de ellas:
 
@@ -149,10 +144,10 @@ No siempre hay una relación lineal entre las variables: puede ser que las varia
 
 No se puede establecer causalidad a partir de la correlación: puede ser que las variables independientes estén correlacionadas con la variable dependiente, pero eso no significa que sean la causa de su variación. Puede haber otras variables que no se hayan incluido en el modelo y que sean las verdaderas causas de la variable dependiente.
 
-No se pueden incluir demasiadas variables independientes en el modelo: puede ser que al incluir muchas variables independientes en el modelo se produzca un problema de multicolinealidad, es decir, que las variables independientes estén relacionadas entre sí y aporten información redundante o innecesaria al modelo. Esto puede afectar a la precisión y la estabilidad de los coeficientes del modelo y dificultar su interpretación.
+No se pueden incluir demasiadas variables independientes en el modelo: puede ser que al incluir muchas variables independientes en el modelo se produzca un problema de multicolinealidad, es decir, que las variables independientes estén relacionadas entre sí y aporten información redundante o innecesaria al modelo. Esto puede afectar a la precisión y la estabilidad de los coeficientes del modelo y dificultar su interpretación. De igual forma, puede generarse un sobre ajuste, el cual haría que el modelo no pueda reproducirse en diferentes poblaciones.
 
+Una gran limitación con la que nos encontramos en el MRLM es que aun cuando los datos no se distribuyen normal, asumimos una distribución normal para hacer inferencia. El MRLM es robusto para variables que no se distribuyen normal, no obstante, eso nunca va a ser un modelo exacto apegado a la realidad
 
->>>>>>> Stashed changes
 
 \pagebreak
 \newpage
@@ -161,11 +156,6 @@ No se pueden incluir demasiadas variables independientes en el modelo: puede ser
 
 ## Análisis de la base de datos
 
-<<<<<<< Updated upstream
-
-Aquí va filtros aplicados, estadígrafos, gráficas, limpieza y selección de variable depen-
-diente con justificación
-=======
 De la librería de tidyr, utilizamos la función filter, para filtrar la base de datos con los datos de USA.
 
 Utilizamos de la librería dplyr la función de select, para eliminar las variables que la selección backward nos quitó, ya que de esa forma las eliminabamos de la base a modelar.
@@ -173,56 +163,65 @@ Utilizamos de la librería dplyr la función de select, para eliminar las variab
 Debido a las fechas que elegimos no tuvimos que hacer ningún tratamiento de NA´s, ya que hubo datos en todas las variables que utilizamos para todas las fechas que analizamos
 
 Seleccionamos new_deaths ya que es una variable que nos explica cuantas personas fueron muriendo debido al COVID
->>>>>>> Stashed changes
+
+La base de datos viene de Data on COVID-19 (coronavirus) por Our World in Data, tiene perfiles de 207 países y monitorea 67 variables de forma diaria a partir del 3 de enero de 2020.
+
 
 ## Selección de la variable explicativa 
 
-\pagebreak
-\newpage
+Dado el enfoque que le quisimos dar al modelo, que es: Situarnos en el punto histórico de las 3 primeras olas de COVID-19, para poder predecir una cuarta ola de COVID y en especifico las muertes que esto provocaría. Quisimos observar la influencia de las vacunas en disminuir las muertes por COVID-19. Después de acotar las posibles variables explicativas, con el proceso que anteriormente explicamos en este documento, nos propusimos a usar las que también tuvieran sentido en nuestra realidad. 
+
+Es por eso, que escogimos usar las nuevas personas vacunadas, la velocidad de propagación de COVID-19 y el porcentaje de la población que dieron positivos. Usando estas variables queremos saber si las políticas relacionadas a las campañas de vacunación tuvieron un impacto positivo en las tasas de muertes
+
+Se pueden observar las variables y su linealidad en los siguientes gráficos de correlación:
+
+```{r, ggpair, comment = ""}
+
+first_set
+
+second_set
+
+third_set
+
+
+```
+
+
+Como se ve en los ggpairs, las variables con relación lineal respecto a las nuevas muertes son:
+Con relación positiva: icu_patients, hosp_patients, new_cases
+Relación negativa: total_vaccinations, people_vaccinated
+
+Las nuevas vacunas no tienen una relación establecida con el total de muertes
+
+
+```{r, M0, comment = ""}
+
+summary(m0)
+
+
+```
+
+
+
+Estas fueron nuestras variables iniciales, no obstante por el modelo anterior, rechazamos aquellas que tuvieran un pvalue > .05 ya que no eran significativas para nuestro modelo.
+
+Eso nos dejó con positive_rate, reproduction_rate y new_vaccinations
+
 
 # Modelo de regresión lineal múltiple 
 
 ## Justificación de la selección del MRLM
 
-## Limitantes del modelo 
+El uso de un MRLM está justificado por las siguientes razones:
 
-\pagebreak
-\newpage
+1. Control de variables: Al incluir múltiples variables predictoras en el modelo, podemos controlar el efecto individual de cada una de ellas en la variable de respuesta, manteniendo las demás variables constantes. Esto nos ayuda a comprender el impacto específico de cada variable y realizar inferencias más precisas.
 
-## Análisis y significancia de los coeficientes 
+2.	Mayor precisión: Al considerar múltiples variables predictoras, el MRLM puede proporcionar estimaciones más precisas de la relación entre las variables independientes y la variable dependiente. Al capturar las interacciones entre las variables dependientes, el modelo puede explicar mejor la variabilidad observada en los datos y reducir los errores de predicción.
 
-<<<<<<< Updated upstream
-## R^2 y R^2 Ajustada (Bondad de ajuste)
+3.	Variables no explicativas eliminables: En situaciones donde existen variables que pueden afectar tanto a la variable de respuesta como a las variables dependientes, el MRLM puede controlar y ajustar los efectos de estas variables. Esto nos permite obtener una interpretación más precisa de las relaciones entre las variables de interés.
 
-=======
-```{r Significancia, comment = ""}
+4.	Predicciones multivariables: Si nuestro objetivo es realizar predicciones basadas en múltiples variables predictoras, el MRLM es una elección adecuada. El modelo puede combinar la información de varias variables para predecir el valor de la variable de respuesta, lo que resulta útil en escenarios de pronóstico y toma de decisiones.
 
-
-
-
-
-
-```
-Se puede observar en la tabla ANOVA, que todos los coeficientes seleccionados son significativos, esto es debido a que el p-value es menor a 0.05.
-
-## R^2 y R^2 Ajustada (Bondad de ajuste)
-
-
-```{r R^2, comment ="La R^2 es"}
-
-
-
-```
-
-```{r, R^2_ADJ, comment ="La R^2 ajustada es"}
-
-
-
-```
-
-
-
->>>>>>> Stashed changes
 \pagebreak
 \newpage
 
@@ -232,7 +231,7 @@ Se puede observar en la tabla ANOVA, que todos los coeficientes seleccionados so
 
 #### Heterocedasticidad 
 
-Comprobamos heterocedisticidad (la varianza de los errores es constante), lo comprobamos con un gráfico comparando los residuales con las Y observadas (ŷ), para esto tenemos que hacer un DF con ambos vectores obtenidos de nuestro modelo
+Comprobamos homocedisticidad (la varianza de los errores es constante), lo comprobamos con un gráfico comparando los residuales con las Y observadas (ŷ), para esto tenemos que hacer un DF con ambos vectores obtenidos de nuestro modelo
 
 
 
@@ -247,7 +246,7 @@ ggplot(data = prueba_heter) +
 ```
 
 
-Se puede observar que hay un patrón como un cono de izquierda a derecha, por lo que no podemos afirmar que existe heterocedasticidad. Lo que nos lleva a hacer una transformación Box-Cox, la cual es hacer una transformación logarítmica a nuestra Y dependiendo de la lambda obtenida.
+Se puede observar que hay un patrón como un cono de izquierda a derecha, por lo que no podemos afirmar que existe homocedasticidad. Lo que nos lleva a hacer una transformación Box-Cox, la cual es hacer una transformación a Y dependiendo de la lambda obtenida.
 
 
 \pagebreak
@@ -262,7 +261,7 @@ boxcox(Y_filtrada ~ 1)
 
 ```
 
-```{r, lambda, comment = "y se puede observar que la lambda es:" }
+```{r, lambda, comment = "y se obtiene una lambda maximizadora de verosimilitud de:" }
 
 lambda
 
@@ -271,7 +270,7 @@ lambda
 \pagebreak
 \newpage
 
-Hacemos la transformación de nuestra Y elevandola a la lambda [Y^Lambda] y hacemos un modelo nuevo con esta Y, en el que vamos a verificar que se cumpla la heterocedasticidad. La cual se observa en el siguiente gráfico
+Hacemos la transformación de nuestra Y elevandola a la lambda [Y^Lambda] y hacemos un modelo nuevo con esta Y, en el que vamos a verificar que se cumpla la homocedasticidad. La cual se observa en el siguiente gráfico.
 
 ```{r, heter BC, commet = ""}
 
@@ -279,10 +278,13 @@ grafico_heter_bc
 
 ```
 
+Ya no se observa un patrón establecido en el gráfico por lo que continuamos con la validación de la significancia de nuestros regresores.
+
 \pagebreak
 \newpage
 
-Ya no se puede observar un patrón establecido en la base por lo que continuamos con la validación de las significancia
+Comprobamos significancia con la Anova, el VIF y el summary de nuestro nuevo modelo:
+
 
 ```{r, comprobación de significancia, comment = ""}
 
@@ -295,7 +297,7 @@ vif(modelo_box_cox)
 ```
 
 
-Nuestros regresores siguen siendo significantes, por lo que podemos continuar con las siguientes comprobaciones de supuestos 
+Nuestros regresores siguen siendo significativos, ya que todos siguen dando un p-value menor a .05, tanto en la ANOVA como en el summary, por lo que podemos continuar con las siguientes comprobaciones de supuestos.
 
 \pagebreak
 \newpage
@@ -335,6 +337,16 @@ Checamos que se siga cumpliendo la significancia del modelo
 
 summary(modelo_box_cox_updated)
 
+
+
+```
+
+
+\pagebreak
+\newpage
+
+```{r, BC_MODELO_COMPLETO, comment = ""}
+
 anova(modelo_box_cox_updated)
 
 vif(modelo_box_cox_updated)
@@ -342,6 +354,7 @@ vif(modelo_box_cox_updated)
 ```
 
 
+Se sigue cumpliendo la significancia de los regresores, por lo que podemos continuar con el nuevo modelo 
 
 ```{r, dw_bc, comment = ""}
 
@@ -349,11 +362,20 @@ dwtest(modelo_box_cox_updated, alternative ="two.sided",iterations = 1000)
 
 ```
 
+El coeficiente DW, queda en el area inconclusa de la recta de DW, por lo que vamos a continuar con nuestras variables regresoras.
 
+\pagebreak
+\newpage
 
 #### Presencia de errores atípicos 
 
+Por la construcción del modelo de Mínimos Cuadrados Ordinarios (MCO) los datos atípicos pueden desviar la recta estimada de regresión. Esto puede generar una mala interpretación de lo que sucede en un proceso o población. 
 
+Por lo tanto, es importante identificar estos errores y tratarlos de forma adecuada. Lo ideal no es ignorarlos, ya que esto puede representar una distorsión del análisis que estamos haciendo. 
+
+Para identificarlos, usamos el siguiente gráfico, si alguno de los datos rebasa el valor de 4 o -4 se considera un dato atípico, usamos estos valores porque está aceptado que fuera de ese rango, se determina un dato atípico. Esos datos atípicos los descartamos de nuestro modelo única y exclusivamente cuando representan un error en el registro de datos. 
+
+Este grafico está construido de la siguiente forma; en el eje de las Y’s se encuentran los valores de cada error divididos por la raiz del MSE; en el eje de las X’s se encuentran los datos de cada regresor, es decir el error que se genera por cada valor de los regresores, el -4 y 4 son desviaciones estandar, se considera que un dato que eté 4 desviaciones estandar lejos de la media es un dato muy poco probable de que ocurra, por lo que se puede acotar a un cap&floor, o eliminar.
 
 ```{r, ea, comment = ""}
 
@@ -386,18 +408,13 @@ grafico_ea_m_bc
 
 ```
 
+Como podemos observar en este gráfico, todos los errores se encuentras dentro del intervalo [-4,4], con esto sabemos que no contamos con datos atípicos en el modelo.
 
-
+\pagebreak
+\newpage
 
 #### Comprobación de la linealidad de la Fn de regresión
 
-<<<<<<< Updated upstream
-#### Heterocedasticidad 
-
-#### Independencia en los errores 
-
-#### Presencia de errores atípicos 
-=======
 Eso lo comprobamos con las R^2 ya que sabemos que matemáticamente es SSE/SST y es el porcentaje de variabilidad que es explicada por el modelo.
 
 
@@ -410,13 +427,31 @@ suma$r.squared
 
 ```
 
-nos dice que hay una bondad de ajuste del 86% de nuestro modelo con Y, lo cual nos dice que sí es lineal 
-
->>>>>>> Stashed changes
+nos dice que hay una bondad de ajuste del 86% de nuestro modelo con Y, lo cual nos dice que sí es lineal la fn de regresión.
 
 #### Verificación de la normalidad en los errores 
 
+La mejor forma de comprobar la normalidad de los errores es con una prueba de QQ plot, o gráfica cuantil cuantil. En este método se comparan los valores que deberían toma la normal y la distribución que este tomando la muestra. 
 
+```{r, qqplot, comment = ""}
+
+ui_back <- as.data.frame(modelo_box_cox_updated$residuals)
+colnames(ui_back) <- c("Ui")
+
+ui_back %>% 
+  ggplot(aes(sample = Ui)) + 
+  stat_qq() +
+  stat_qq_line() + 
+  ggtitle("QQ Plot Residuales") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+```
+
+Si los datos de nuestro modelo se comportasen de manera normal, los puntos se alinearían a lo largo de la línea diagonal. Como se puede apreciar en la siguiente gráfica Q-Q plot, los datos tienen un sesgo a la derecha, por lo que se viola el supuesto de normalidad de los errores. 
+
+Dado que el MRLM es robusto ante la normalidad podemos utilizar nuestros resultados para hacer inferencia estadística. Esto se debe a que el método empleado para calcular los coeficientes de regresión del modelo, el MCO, busca minimizar la suma de los errores cuadrados entre los valores observados y los valores predichos. 
 
 
 \pagebreak
@@ -424,16 +459,45 @@ nos dice que hay una bondad de ajuste del 86% de nuestro modelo con Y, lo cual n
 
 # Predicciones
 
+Ya que nuestro modelo cumple con los supuestos necesarios, podemos utilizarlo para predecir la base de validación. Nuestra base de validación es de la ola 3, 2021-07-01, al final de las olas en USA, 2022-04-21.
+
+Cuando utilizas la población de validación, necesitas aplicarle la lambda que se utilizó en la transformación Box-Cox y también es necesario ponerle el lag a esta nueva base, ya que si no no se podría validar.
+
+Una vez que le hacemos las transformaciones a la base de validación, hacemos los intervalos de predicción y de confianza, el de confianza es para E[Y/X´s] y los de predicción buscan meter a todas las observaciones de Y.
+
+```{r, predicción y confianza , comment = ""}
+
+grafico_pred
+
+```
+
+
+Se puede apreciar que nuestra base de entrenamiento logra predecir de forma correcta la subida y bajada de los datos reales, por lo que la predicción es correcta. Se observa que a partir de la fecha en la que inicia la base de validación va a haber un aumento en muertes, y se ve que van a disminuir hasta que termine abril. Esto es muy cercano a lo real en la base de datos que tenemos de validación, lo que se ve con los puntos negros.
+
+\pagebreak
+\newpage
+
 # Conclusiones
 
 ## Porqué es útil el modelo
 
+Al producir predicciones basadas en evidencia sobre el comportamiento de una cuarta ola por COVID-19, nuestro modelo ofrece oportunidades al sector salud en general, tanto a los oferentes de los servicios de salud, como a los demandantes. Por el lado de la oferta, el modelo ayudará a hacer más eficiente el uso de recursos, programando correctamente costos asociados al tratamiento del COVID, designando un número adecuado de camas de hospital para pacientes que necesiten ser internados y evitando perdidas relacionadas a un exceso o deficiencia de insumos. 
+
+Esto también ayudará al público en general, pues un ajuste de la demanda de insumos médicos podría desencadenar un reajuste en los precios del mercado. No obstante, la mayor contribución al bienestar de los pacientes radica en el hecho de los hospitales contarán con los recursos necesarios para atender los casos más graves, salvando a la mayor cantidad de personas.
+
+Por último, este modelo busca apoyar al personal de nuestro sistema de salud, aseguradose de que cuenten con los materiales necesarios para cuidar tanto de los pacientes, como de ellos mismos.
+
+
 ## Cómo mejorar el modelo 
 
-\pagebreak
-\newpage
+En el futuro, nos gustaría que nuestro modelo fuese reentrenado con información adicional que refleje el ritmo de vacunación. También, el acceso a información más detallada nos daría la oportunidad de proveer información a nivel local, de manera que pueda realizar predicciones más precisas sobre mercados de salud subnacionales. Así mismo, en el futuro nos gustaría reducir las áreas de oportunidades al ampliar el espectro de información que sirve de base a nuestro modelo. En concreto, nos enfocaremos en dos áreas de oportunidades para hacer las predicciones más precisas, que es ampliar la información a otros mercados nacionales y poder discriminar entre cepas del virus, que se ha demostrado tienen comportamientos distintos. 
 
 # Bibliografía
 
 Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani, Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020) - "Coronavirus Pandemic (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
 
+COVID-19 Map. (s.f.). Johns Hopkins Coronavirus Resource Center. Recuperado 24 de mayo de 2023, de https://coronavirus.jhu.edu/map.html
+
+Times, T. N. Y. (2020, marzo 3). Coronavirus in the U.S.: Latest Map and Case Count. The New York Times. https://www.nytimes.com/interactive/2023/us/covid-cases.html
+
+CDC Museum COVID-19 Timeline. (2023, marzo 15). Centers for Disease Control and Prevention. https://www.cdc.gov/museum/timeline/covid19.html
