@@ -501,3 +501,5 @@ COVID-19 Map. (s.f.). Johns Hopkins Coronavirus Resource Center. Recuperado 24 d
 Times, T. N. Y. (2020, marzo 3). Coronavirus in the U.S.: Latest Map and Case Count. The New York Times. https://www.nytimes.com/interactive/2023/us/covid-cases.html
 
 CDC Museum COVID-19 Timeline. (2023, marzo 15). Centers for Disease Control and Prevention. https://www.cdc.gov/museum/timeline/covid19.html
+
+Proyecto Rodillo. (2021, 13 agosto). Regions - Proyecto Rodillo - El termómetro del COVID-19 en Latinoamérica. Proyecto Rodillo - El termómetro del COVID-19 en Latinoamérica. https://rodillo.org/coronavirus-stats/estados-unidos/?gclid=CjwKCAjw67ajBhAVEiwA2g_jEE50rA38MHTXrzWBzBFJdGMlHIbZvOzU_vAfsJdPEjMJKdFYOEnpgxoCMmYQAvD_BwE

@@ -386,7 +386,7 @@ p <- ggplot(val_lm_df, aes(date, new_deaths)) +
 
 #
 
-grafico_pred <- ggplot(val_lm_df, aes(x = date)) + 
+grafico_pred <-p +  
   stat_smooth(aes(y = lwr1), color = "red", linetype = "dashed", se = FALSE) +
   stat_smooth(aes(y = upr1), color = "red", linetype = "dashed", se = FALSE) +
   stat_smooth(aes(y = pred), color = "blue", se = FALSE) +
