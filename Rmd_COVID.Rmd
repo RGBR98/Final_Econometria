@@ -45,11 +45,18 @@ library(knitr)
 library(broom)
 library(caTools)
 library(car)
+library(zoo)
 
+<<<<<<< Updated upstream
 
 rm(list=ls())
 
 set.seed(3234)
+=======
+set.seed(323)
+
+source("MRLM_EUA.R")
+>>>>>>> Stashed changes
 
 raw_df <- read_csv("owid-covid-data.csv")
 
@@ -59,11 +66,39 @@ raw_df <- read_csv("owid-covid-data.csv")
 
 # Introducción
 
+<<<<<<< Updated upstream
 ## Problema de interés: Análisis 
 
 ### Breve explicación de la base de datos
 
 Al momento de seleccionar variables eliminamos variables que explicaban lo mismo pero tenían algún tipo de transformación lineal. Un ejemplo de estas son total_cases y total_cases_per_million. 
+=======
+## Problema de interés: Análisis de new_deaths con un MRLM en EUA tomando como base de entrenamiento desde el momento en el que salió la vacuna hasta el final de la ola 3, para poder predecir la ola 4 con el modelo
+
+Queremos analizar el efecto que tuvieron las variables elegidas con respecto las muertes del COVID y con esos regresores poder analizar las siguientes olas del covid.
+
+
+### Breve explicación de la base de datos
+
+
+**Glosario de Y y los regresores que utilizamos.**
+
+La información está tomando en cuenta los 7 días de la semana.
+
+
+**Nuestra variable a analizar [Y] - new_deaths:** Son las nuevas muertes atribuidas al COVID-19. 
+
+**Location:** Es la ubicación geografica, nos ayudó a filtrar nuestra base de datos sólo a USA
+
+**Date:** Desde la primer vacunación recibida en EUA al final de la 4ta ola 
+
+**reproduction_rate:** Estimación a tiempo real de la reproducción efectiva del COVID
+
+**positive_rate:** El porcentaje de pruebas COVID positivas que hay 
+
+**new_vaccinations:** Nuevas vacunas administradas de COVID 19
+
+>>>>>>> Stashed changes
 
 \pagebreak
 \newpage
@@ -72,9 +107,52 @@ Al momento de seleccionar variables eliminamos variables que explicaban lo mismo
 
 ## Conceptos básicos
 
+El MRLM es una técnica para modelar la relación lineal entre 3 o más variables. De manera general, el MRLM se define en la siguiente ecuación: y=BO + B1X1 + B2X2 + . . . + BnXn + U Donde y es la variable dependiente y las Xi son las variables independientes, mientras que la variable u, denominada como la perturbación estocástica, son variables aleatorias no observables que representa a todos los factores distintos de x que afectan a y. 
+
+En tanto BO, representa el coeficiente del intercepto y las B1 en adelante representan los coeficientes de cada pendiente. Los coeficientes de las pendientes son el interés principal del análisis econométrico, pues mide el efecto de las variables independientes sobre la variable dependiente mantenido todos los demás factores constantes.
+
+
 ## Supuestos del modelo 
 
+<<<<<<< Updated upstream
 ## Método de selección de variables y limitaciones del modelo
+=======
+Hay algunos requisitos o supuestos que se deben cumplir para que el modelo sea válido y confiable. Estos son los cuatro supuestos principales:
+
+Independencia: los residuos (las diferencias entre los valores observados y los estimados por el modelo) deben ser independientes entre sí. Esto significa que no hay una relación o patrón entre los errores del modelo. Una forma de asegurar la independencia es seleccionar los datos de forma aleatoria y no sesgada.
+Homocedasticidad: los residuos deben tener una varianza constante. Esto significa que la variabilidad de los errores del modelo no depende del valor de las variables independientes.
+
+No multicolinealidad: las variables independientes no deben estar relacionadas entre sí o, al menos, su relación debe ser muy débil. Esto significa que no hay redundancia o duplicidad en la información que aportan las variables independientes al modelo.
+
+Normalidad: los residuos deben seguir una distribución normal, es decir, una distribución simétrica y acampanada alrededor del cero. Esto significa que los errores del modelo son aleatorios y no tienen tendencia o sesgo. Una forma de comprobar la normalidad es mediante un gráfico de probabilidad normal o una prueba estadística.
+
+
+## Método de selección de variables 
+
+Al momento de seleccionar variables eliminamos variables que explicaban lo mismo pero tenían algún tipo de transformación lineal. Un ejemplo de estas son new_vaccinations y new_vaccinations_per_million.
+
+Eliminamos variables que eran constantes y variables que fueran de character.
+
+Checamos de las variables restantes con gráficos de ggpairs, y vimos las relaciones que tenía new_deaths con las variables restantes, dejando en nuestro modelo las variables que tuvieran una relación lineal respecto a nuestra Y
+
+Al meter las variables elegidas al modelo, vimos que quedaban algunas que tenían un Pvalue mayor a .05 por lo que esas variables tambien fueron eliminadas del modelo.
+
+Ya por último, con la selección restante, utilizamos el Variance Inflation Factor (VIF), su expresión matemática es (1/(1-Ri^2)), el cual nos ayuda a cuantificar la intensidad que hay de multicolinealidad entre los regresores. Aceptamos Variables con VIF menores de 10 en el modelo.
+
+## Limitaciones del modelo
+
+Una gran limitación con la que nos encontramos en el MRLM es que aun cuando los datos no se distribuyen normal, asumimos una distribución normal para hacer inferencia. El MRLM es robusto para variables que no se distribuyen normal, no obstante, eso nunca va a ser un modelo exacto apegado a la realidad
+
+Usar un modelo de regresión lineal múltiple como modelo de predicción tiene algunas limitaciones que debemos tener en cuenta. Estas son algunas de ellas:
+
+No siempre hay una relación lineal entre las variables: puede ser que las variables dependientes e independientes no tengan una relación lineal, sino curvilínea o no lineal. En ese caso, el modelo de regresión lineal múltiple no sería adecuado para describir o predecir la variable dependiente.
+
+No se puede establecer causalidad a partir de la correlación: puede ser que las variables independientes estén correlacionadas con la variable dependiente, pero eso no significa que sean la causa de su variación. Puede haber otras variables que no se hayan incluido en el modelo y que sean las verdaderas causas de la variable dependiente.
+
+No se pueden incluir demasiadas variables independientes en el modelo: puede ser que al incluir muchas variables independientes en el modelo se produzca un problema de multicolinealidad, es decir, que las variables independientes estén relacionadas entre sí y aporten información redundante o innecesaria al modelo. Esto puede afectar a la precisión y la estabilidad de los coeficientes del modelo y dificultar su interpretación.
+
+
+>>>>>>> Stashed changes
 
 \pagebreak
 \newpage
@@ -83,9 +161,19 @@ Al momento de seleccionar variables eliminamos variables que explicaban lo mismo
 
 ## Análisis de la base de datos
 
+<<<<<<< Updated upstream
 
 Aquí va filtros aplicados, estadígrafos, gráficas, limpieza y selección de variable depen-
 diente con justificación
+=======
+De la librería de tidyr, utilizamos la función filter, para filtrar la base de datos con los datos de USA.
+
+Utilizamos de la librería dplyr la función de select, para eliminar las variables que la selección backward nos quitó, ya que de esa forma las eliminabamos de la base a modelar.
+
+Debido a las fechas que elegimos no tuvimos que hacer ningún tratamiento de NA´s, ya que hubo datos en todas las variables que utilizamos para todas las fechas que analizamos
+
+Seleccionamos new_deaths ya que es una variable que nos explica cuantas personas fueron muriendo debido al COVID
+>>>>>>> Stashed changes
 
 ## Selección de la variable explicativa 
 
@@ -103,8 +191,38 @@ diente con justificación
 
 ## Análisis y significancia de los coeficientes 
 
+<<<<<<< Updated upstream
 ## R^2 y R^2 Ajustada (Bondad de ajuste)
 
+=======
+```{r Significancia, comment = ""}
+
+
+
+
+
+
+```
+Se puede observar en la tabla ANOVA, que todos los coeficientes seleccionados son significativos, esto es debido a que el p-value es menor a 0.05.
+
+## R^2 y R^2 Ajustada (Bondad de ajuste)
+
+
+```{r R^2, comment ="La R^2 es"}
+
+
+
+```
+
+```{r, R^2_ADJ, comment ="La R^2 ajustada es"}
+
+
+
+```
+
+
+
+>>>>>>> Stashed changes
 \pagebreak
 \newpage
 
@@ -112,15 +230,194 @@ diente con justificación
 
 ### Análisis de residuales
 
+#### Heterocedasticidad 
+
+Comprobamos heterocedisticidad (la varianza de los errores es constante), lo comprobamos con un gráfico comparando los residuales con las Y observadas (ŷ), para esto tenemos que hacer un DF con ambos vectores obtenidos de nuestro modelo
+
+
+
+```{r, Grafico_heter, comment = ""}
+
+
+ggplot(data = prueba_heter) +
+  geom_point(aes(x = Y_estimada, y = Residuales)) +
+  geom_hline(yintercept = 2*s_m1) + 
+  geom_hline(yintercept = -2*s_m1)
+
+```
+
+
+Se puede observar que hay un patrón como un cono de izquierda a derecha, por lo que no podemos afirmar que existe heterocedasticidad. Lo que nos lleva a hacer una transformación Box-Cox, la cual es hacer una transformación logarítmica a nuestra Y dependiendo de la lambda obtenida.
+
+
+\pagebreak
+\newpage
+
+Obtenemos el gráfico en el que obtenemos la lambda donde se maximiza la verosimilitud 
+
+```{r, Lambda, comment = ""}
+
+
+boxcox(Y_filtrada ~ 1)
+
+```
+
+```{r, lambda, comment = "y se puede observar que la lambda es:" }
+
+lambda
+
+```
+
+\pagebreak
+\newpage
+
+Hacemos la transformación de nuestra Y elevandola a la lambda [Y^Lambda] y hacemos un modelo nuevo con esta Y, en el que vamos a verificar que se cumpla la heterocedasticidad. La cual se observa en el siguiente gráfico
+
+```{r, heter BC, commet = ""}
+
+grafico_heter_bc
+
+```
+
+\pagebreak
+\newpage
+
+Ya no se puede observar un patrón establecido en la base por lo que continuamos con la validación de las significancia
+
+```{r, comprobación de significancia, comment = ""}
+
+anova(modelo_box_cox)
+
+summary(modelo_box_cox)
+
+vif(modelo_box_cox)
+
+```
+
+
+Nuestros regresores siguen siendo significantes, por lo que podemos continuar con las siguientes comprobaciones de supuestos 
+
+\pagebreak
+\newpage
+
+#### Independencia en los errores 
+
+
+Al ser una serie de tiempo, sí hay que buscar la independencia de los errores, la cual nos dice que corr(ei, ei-1) = 0. Para esto utilizamos la prueba DurwinWatson, en la que si está de [0, dl] u [4-dl, 4], se rechaza el coeficiente, cuando está entre [dl, du] u [4dl, 4du], queda inconcluso el dato y podemos continuar con los supuestos, y si está [du, 4-du], se acepta la independencia de los errores.
+
+
+
+```{r, DW, comment = ""}
+
+
+dwtest(modelo_box_cox,alternative ="two.sided",iterations = 1000)
+
+
+```
+
+Al correr durwin Watson nos da un coeficiente que sí entra en el area de rechazo, por lo que tenemos que no hay independencia de los errores y tenemos que arreglarla.
+
+La forma de arreglar el DW test es aplicando un lag en nuestra Y, pero como ya tenemos la Y transformada, esa es la que se tiene que laggear, no la que no está transformada.
+
+Al momento de laggear una fecha lo que se hace es que el dato de nuestro primer día, se va al segundo, dejando un NA a esa fecha, y después de eso eliminamos el NA, basicamente acortando nuestra base de datos por un día.
+
+Eso nos da un nuevo modelo en el que metemos el lag como un nuevo regresor.
+
+```{r, BC_MODELO, comment = ""}
+
+modelo_box_cox_updated <- update(modelo_box_cox, . ~ . + lag_muertes, data = train_lm_df)
+
+```
+
+Checamos que se siga cumpliendo la significancia del modelo
+
+```{r, BC_MODELO_COMP, comment = ""}
+
+summary(modelo_box_cox_updated)
+
+anova(modelo_box_cox_updated)
+
+vif(modelo_box_cox_updated)
+
+```
+
+
+
+```{r, dw_bc, comment = ""}
+
+dwtest(modelo_box_cox_updated, alternative ="two.sided",iterations = 1000)
+
+```
+
+
+
+#### Presencia de errores atípicos 
+
+
+
+```{r, ea, comment = ""}
+
+anova_m_bc <- anova(modelo_box_cox_updated)
+sqrt_mse_m_bc <- sqrt(anova_m_bc[5,3])
+
+ea_df_m_bc <- as.data.frame(cbind(train_lm_df$positive_rate,train_lm_df$reproduction_rate,
+                                train_lm_df$new_vaccinations,train_lm_df$lag_muertes,
+                                modelo_box_cox_updated$residuals/sqrt_mse_m_bc))
+
+colnames(ea_df_m_bc) <- c("X1", "X2", "X3","X4", "Errores")
+
+grafico_ea_m_bc <- ea_df_m_bc %>% 
+  ggplot() + 
+  geom_hline(yintercept = -4, colour = "red") + 
+  geom_hline(yintercept = 4, colour = "red")  +
+  geom_point(aes(x = X1, y = Errores, color = "positive_rate")) + 
+  geom_point(aes(x = X2, y = Errores, color = "reproduction_rate")) +
+  geom_point(aes(x = X3, y = Errores, color = "new_vaccinations")) +
+  geom_point(aes(x = X3, y = Errores, color = "lag_muertes")) +
+  ggtitle("X vs ui / raiz(mse)") +
+  ylab("ui / raiz(mse)") +
+  labs(title = "Datos atípicos") + 
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_color_manual(values = c("lag_muertes" = "blue", "positive_rate" = "green", 
+                                "reproduction_rate" = "black", "new_vaccinations" = "red"))
+
+grafico_ea_m_bc
+
+```
+
+
+
+
 #### Comprobación de la linealidad de la Fn de regresión
 
+<<<<<<< Updated upstream
 #### Heterocedasticidad 
 
 #### Independencia en los errores 
 
 #### Presencia de errores atípicos 
+=======
+Eso lo comprobamos con las R^2 ya que sabemos que matemáticamente es SSE/SST y es el porcentaje de variabilidad que es explicada por el modelo.
+
+
+
+```{r, R^2_ADJ_Supuestos, comment = "Una R^2 ajustada de"}
+
+suma <- summary(modelo_box_cox_updated)
+suma$r.squared
+
+
+```
+
+nos dice que hay una bondad de ajuste del 86% de nuestro modelo con Y, lo cual nos dice que sí es lineal 
+
+>>>>>>> Stashed changes
 
 #### Verificación de la normalidad en los errores 
+
+
+
 
 \pagebreak
 \newpage
